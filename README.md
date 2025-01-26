@@ -2,6 +2,6 @@
 
 请选择以下笔记查看：
 
-- [MachineLearning1 笔记](./MachineLearning.md)
+- [MachineLearning 笔记](./MachineLearning.md)
 
   

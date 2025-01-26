@@ -1,16 +1,6 @@
-```
-<head>
-    <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML" type="text/javascript"></script>
-    <script type="text/x-mathjax-config">
-        MathJax.Hub.Config({
-            tex2jax: {
-            skipTags: ['script', 'noscript', 'style', 'textarea', 'pre'],
-            inlineMath: [['$','$']]
-            }
-        });
-    </script>
-</head>
-```
+---
+title: MachineLearning1 笔记
+---
 
 
 
@@ -1814,13 +1804,13 @@ $$
 
 线性回归模型 ：<font color="blue">$f_{(\vec{w},b)}(\vec{x})=\vec{w}·\vec{x}+b$</font>
 
-正则化代价函数 : <font color="blue">$\underset{\vec{w},b}{\text{min }} J(\vec{w}, b) = \frac{1}{2m}\bigg[ \sum_{i=1}^{m} (f_{\vec{w},b}(\vec{x}^{(i)}) - y^{(i)})^2+\frac{\lambda}{2m}\sum_{j=1}^{n} w_j^2\bigg],(\lambda>0)$</font>
+正则化线性回归代价函数 : <font color="blue">$\underset{\vec{w},b}{\text{min }} J(\vec{w}, b) = -\frac{1}{m} \sum_{i=1}^{m} \bigg[ y^{(i)} \log(f_{\vec{w},b}(\vec{x}^{(i)})) + (1 - y^{(i)}) \log(1 - f_{\vec{w},b}(\vec{x}^{(i)})) \bigg] + \frac{\lambda}{2m} \sum_{j=1}^{n} w_j^2, \quad (\lambda > 0)$</font>
 
 正则化线性回归梯度下降算法：	
 
 ​	repeat : {
 
-​		<font color="blue">$w_j = w_j - \alpha \frac{\partial}{\partial w_j} J(w, b)=w_j - \alpha \bigg[  \frac{1}{m} \sum_{i=1}^m (f_{w,b}(\vec{x}^{(i)}) - y^{(i)})x^{(i)}_{j} + \frac{\lambda}{m}w_{j} \bigg] $</font>
+​		<font color="blue">$w_j = w_j - \alpha \frac{\partial}{\partial w_j} J(w, b)=w_j - \alpha \bigg[  \frac{1}{m} \sum_{i=1}^m \bigg[(f_{w,b}(\vec{x}^{(i)}) - y^{(i)})x^{(i)}_{j} \bigg] + \frac{\lambda}{m}w_{j} \bigg] $</font>
 
 ​		<font color="blue">$b = b - \alpha \frac{\partial}{\partial b} J(w, b)=b - \alpha \bigg[ \frac{1}{m} \sum_{i=1}^m (f_{\vec{w},b}(\vec{x}^{(i)}) - y^{(i)})\bigg] $</font>
 
@@ -1828,7 +1818,7 @@ $$
 
 
 
-- 可选内容
+- 解释
 
 观察一下$w_j$的更新步骤：
 
@@ -1836,3 +1826,48 @@ $$
 2. 非正则化梯度下降过程：$w_j = \bigg[ w_j  \bigg]- \alpha  \frac{1}{m} \sum_{i=1}^m (f_{w,b}(\vec{x}^{(i)}) - y^{(i)})x^{(i)}_{j}   $
 
 假设$\alpha=0.01,\lambda=1,m=50$则 $w_j \bigg [ 1 - \alpha \frac{\lambda}{m} \bigg]=w_j \bigg [ 1 - 0.002 \bigg]=0.9998w_j$，相当于每次更新时，都先缩小$w_j$到0.9998倍
+
+
+
+
+
+#### 7.5 Graident Descent( Regularized Logistic Regression )
+
+线性回归模型 ：<font color="blue">$f_{(\vec{w},b)}(\vec{x}) = \frac{1}{1 + e^{-(\vec{w}·\vec{x} + b)}}$</font>
+
+正则化代价函数 : <font color="blue">$\underset{\vec{w},b}{\text{min }} J(\vec{w}, b) = -\frac{1}{m} \sum_{i=1}^{m} \bigg[ y^{(i)} \log(f_{\vec{w},b}(\vec{x}^{(i)})) + (1 - y^{(i)}) \log(1 - f_{\vec{w},b}(\vec{x}^{(i)})) \bigg] + \frac{\lambda}{2m} \sum_{j=1}^{n} w_j^2, \quad (\lambda > 0)$</font>
+
+正则化线性回归梯度下降算法：	
+
+​	repeat : {
+
+​		<font color="blue">$w_j = w_j - \alpha \frac{\partial}{\partial w_j} J(\vec{w}, b)=w_j - \alpha \bigg[  \frac{1}{m} \sum_{i=1}^m \bigg[(f_{w,b}(\vec{x}^{(i)}) - y^{(i)})x^{(i)}_{j}\bigg] + \frac{\lambda}{m}w_{j} \bigg] $</font>
+
+​		<font color="blue">$b = b - \alpha \frac{\partial}{\partial b} J(w, b)=b - \alpha \bigg[ \frac{1}{m} \sum_{i=1}^m (f_{\vec{w},b}(\vec{x}^{(i)}) - y^{(i)})\bigg] $</font>
+
+​	}同时更新
+
+
+
+
+
+
+
+正则化逻辑回归模型的公式如下：
+
+### 逻辑回归模型：
+<font color="blue">$f_{(\vec{w},b)}(\vec{x}) = \frac{1}{1 + e^{-(\vec{w}·\vec{x} + b)}}$</font>
+
+### 正则化代价函数：
+<font color="blue">$\underset{\vec{w},b}{\text{min }} J(\vec{w}, b) = -\frac{1}{m} \sum_{i=1}^{m} \bigg[ y^{(i)} \log(f_{\vec{w},b}(\vec{x}^{(i)})) + (1 - y^{(i)}) \log(1 - f_{\vec{w},b}(\vec{x}^{(i)})) \bigg] + \frac{\lambda}{2m} \sum_{j=1}^{n} w_j^2, \quad (\lambda > 0)$</font>
+
+### 正则化逻辑回归梯度下降算法：
+
+	repeat : {
+	
+		<font color="blue">$w_j = w_j - \alpha \frac{\partial}{\partial w_j} J(w, b) = w_j - \alpha \bigg[ \frac{1}{m} \sum_{i=1}^m (f_{\vec{w},b}(\vec{x}^{(i)}) - y^{(i)})x^{(i)}_{j} + \frac{\lambda}{m}w_{j} \bigg]$</font>
+	
+		<font color="blue">$b = b - \alpha \frac{\partial}{\partial b} J(w, b) = b - \alpha \bigg[ \frac{1}{m} \sum_{i=1}^m (f_{\vec{w},b}(\vec{x}^{(i)}) - y^{(i)}) \bigg]$</font>
+	
+	} 同时更新
+

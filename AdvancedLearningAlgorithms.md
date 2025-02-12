@@ -857,7 +857,7 @@ d=2, \quad & f_{\vec{w},b}(\vec{x}) = w_1x + w_2x^2 + b \\
 d=3, \quad & f_{\vec{w},b}(\vec{x}) = w_1x + w_2x^2 + w_3x^3 + b \\
 & \vdots \\
 d=10, \quad & f_{\vec{w},b}(\vec{x}) = w_1x + w_2x^2 + \cdots + w_{10}x^{10} + b \\
-\end{aligned}
+\end{aligned}
 $$
 算法表明，当d=5 时 $J_{test}(\vec{w}^{<5>},b^{<5>})$的误差最小。 但问题是如果你仅仅根据test set的结果选择d=5的公式，$J_{test}(\vec{w}^{<5>},b^{<5>})$ 是过于乐观的，低于实际的泛化误差。
 
@@ -895,31 +895,228 @@ test set （测试集） ：20%。
 
 ### 12.1 Diagnosing bias and variance
 
+训练机器学习模型时，几乎没有一次就能达成我想要的效果的，因此构建机器学习系统的关键在于如何决定下一步该做什么以及提高性能，查看学习算法的偏差和方差可以很好的指导你下一步该做什么。
+
+
+
+<img src="images/屏幕截图 2025-02-08 202512.png" style="zoom:50%;" />
+
+1. High bias(underfit) ：$J_{train}$的误差很大，cross-validation set 的误差也很大。
+2. High variance (overfit)：$J_{train}$的误差很小，cross-validation set 的误差很大。
+3. just right ： $J_{train}$的误差很小，cross-validation set 的误差也很小。
 
 
 
 
 
+<img src="images/屏幕截图 2025-02-08 204035.png" style="zoom: 33%;" />
 
-### 12.2 Regularization and bais/variacne
+**$J_{train}$**：d=1时，degree of polynomial(多项式次数)很低，欠拟合，$J_{train}$误差很高。而当多项式越来越复杂时(d=4)，拟合效果越来越好，随着degree of polynomial(多项式次数)增加，$J_{train}$通常会下降。
+
+**$J_{cv}$：**d=1时，degree of polynomial(多项式次数)很低，欠拟合，$J_{cv}$误差很高。当多项式越来越复杂时(d=4)，过拟合了，$J_{cv}$的误差仍然很高。 而如果多项式刚刚好（d=2），那么$J_{cv}$就会很低
+
+
+
+- 总结
+
+<img src="images/屏幕截图 2025-02-08 204410.png" style="zoom: 33%;" />
+
+
+
+
+
+### 12.2 Regularization and bais/variance
+
+正则化λ的选择，以及λ如何影响 bais 和 variance的，这将有助于你的算法选择一个好的λ。
+
+
+
+<img src="images/屏幕截图 2025-02-08 214120.png" style="zoom:50%;" />
+
+**λ=10000**：λ非常大，算法倾向于保持参数w非常小，最终$w_1，w_2$这些参数将接近于0，模型变为$f_{\vec{w},b}(\vec{x})=b$这样一个常数。该模型high bias(underfit) , $J_{train}$的误差大，$J_{cv}$的误差大。
+
+**λ=0**：λ非常小，算法倾向于保持参数w非常大。该模型high variance(overfit)， $J_{train}$的误差小，$J_{cv}$的误差大。
+
+**λ=恰当好处**：λ 刚好合适， $J_{train}$的误差小，$J_{cv}$的误差小。
+
+
+
+- 如何选择一个好的λ呢？
+
+<img src="images/屏幕截图 2025-02-08 214351.png" style="zoom:50%;" />
+
+一个一个试，最终找到一个合适的λ，例如从0试到10，最终找到 λ=0.08 是最合适的。
+
+
+
+<img src="images/屏幕截图 2025-02-08 214821.png" style="zoom:50%;" />
+
+λ samll：过拟合。$J_{train}$的误差小，$J_{cv}$的误差大。
+
+λ large：欠拟合。$J_{train}$的误差大，$J_{cv}$的误差大。
 
 
 
 ### 12.3 Establishing a baseline level of performance
 
+- 语音识别问题
+
+![](images/屏幕截图 2025-02-08 221135.png)
+
+1. high variance
+
+人类错误率：10.6%
+
+Training error：10.8%
+
+cross-validation error：14.8%
+
+在training set 上，和人类差不多，而在cv set上，则高了4%的error。因此这个算法有更多的variance问题（overfit），而不是bias问题（underfit）。
+
+
+
+2. high bias
+
+....
+
+
+
+3. highg bias 、high variance
+
+...
+
+
+
+- 你希望算法达到一个什么样的水平？
+
+判断一个训练误差是否高时，建立一个 **基准性能水平** 通常是很有用的。
+
+1. 人类表现水平
+2. 和其他算法表现水平进行比较
+3. 根据经验猜测
+
+不应该问：我的算法误差大吗？
+
+而是应该问：我的算法相对于我最终能达到的水平，误差大吗？
+
+
+
 
 
 ### 12.4 Learning curves
+
+<img src="images/屏幕截图 2025-02-08 223339.png" style="zoom: 50%;" />
+
+1. **$J_{cv}$随着样本数量m的增加，cross-validation set的error减小，很好理解**
+
+2. **$J_{train}$随着样本数量m的增加，error增加**
+
+   m=1时（1个样本），拟合起来很容易,误差很低。
+
+   m=2时（2个样本），拟合直线。
+
+   m=3时（3个样本），拟合曲线。
+
+   m=4时（4个样本），想要兼顾4个样本，拟合有点困难，稍微有点偏差。
+
+   m=5时（5个样本），拟合起来有点困难，出现偏差。
+
+   m=6时（6个样本），拟合出现明显偏差，误差很高。
+
+   随着样本数量的增加，想要兼顾所有样本很困难，因此训练集的表现会越来越差。
+
+
+
+#### high bias（underfit）
+
+![](images/屏幕截图 2025-02-08 231328.png)
+
+如果一个算法具有high bias（underfit），获得的更多数据 并没有多大帮助，从曲线上看，当m的数量到达一定量级后，算法的error会变得平坦。
+
+**<font color="red">high bias 无论你添加多少数据，都不会使你的算法变得更好。</font>**
+
+
+
+#### high variance（overfit）
+
+![](images/屏幕截图 2025-02-08 232545.png)
+
+使用小的λ。**$J_{train}$随着样本数量m的增加，error增加，$J_{cv}$随着样本数量m的增加，error减小**
+
+$J_{cv}$的误差远高于$J_{train}$的误差，high variance set 在 train set的表现远好于 cross-validation set的表现。
+
+画一个baseline level of performance（human level performance），你会发现$J_{train}$的error甚至会低于人类的error，在train set上overfit，以至于得到一个不切实际的低误差，这实际上比人类的能力还要好。
+
+**<font color="red">higt variance，增加样本m的数量，可能会有较大的帮助。</font>**
+
+
+
+- Tips
+
+如果你正在构建一个机器学习应用，你可以绘制学习曲线，你可以使用训练集的不同子集，即使你有1000哥训练样本，你也可以只用100个训练样本训练一个模型，并查看训练误差和交叉验证误差，然后使用200个样本训练一个模型，保留800个样本暂不使用，并绘制$J_{train}和J_{cv}$。如果你以这种方式可视化，那么这可能是另一种让你看到 你的更像高偏差还是高方差的方法
 
 
 
 ### 12.5 Deciding what to try next revisted
 
-
+<img src="images/屏幕截图 2025-02-09 002245.png" style="zoom:50%;" />
 
 ### 12.6 Bias/variance and neural networks
 
+<img src="images/屏幕截图 2025-02-09 002737.png" style="zoom: 33%;" />
 
+high bias 和 high variacne 都会损害算法的性能，神经网络成功的原因，是神经网络提供了一种新的方式，来平衡 high bias - high variance 。
+
+
+
+
+
+<img src="images/屏幕截图 2025-02-09 012709.png" style="zoom:50%;" />
+
+1. 首先在训练集上训练算法，检验$J_{train}$ 的表现是否比baseline level要好？
+
+2. 如果$J_{train}$表现不好 → NO
+
+3. 使用更大的神经网络，更多的隐藏层，每层更多的神经元。
+
+4. 继续这个循环，使你的神经网络越来越大，直到它在训练集上的表现良好。
+
+5. 如果$J_{train}$表现良好 → YES
+
+6. 检验它在 cross-validation set上的表现好吗？ 
+
+7. 如果它在 $J_{cv}$ 的表现不好 → NO。
+
+   你可以得出结论算法 high variance，因为它在training set上的表现好，在cross-validation set上的表现不好，因为$J_{train}$和$J_{train}$直接有一个big gap
+
+8. 解决high variance的方法 是获得更多的数据。
+
+9. 然后重新训练模型，并再次检查它在training set上的表现。
+
+10. 循环此过程，最终$J_{train}和J_{cv}$表现都良好，获得该模型。
+
+
+
+- **局限性：**
+
+1. 增加神经网络，计算成本高（GPU在训练神经网络上很好用，因此需要GPU，其他的硬件则不行）。 
+2. 需要更多数据。
+
+
+
+- **神经网络太大了，会引起high variance吗？**
+
+不会的，一个适当正则化的神经网络表现的和较小的神经网络一样，甚至更好。
+
+<img src="images/屏幕截图 2025-02-09 013621.png" style="zoom:33%;" />
+
+例如 你有一个像左边这样的小神经网络，切换到右边这个更大的神经网络，你会认为过拟合的风险会显著增加，但事实上是，这个大的神经网络，经过正则化以后，表现的会比左边小的神经网络更好。大的神经网络 仅仅会增加成本，减慢训练和推理的过程。
+
+
+
+- **代码：**
+
+<img src="images/屏幕截图 2025-02-09 013545.png" style="zoom:50%;" />
 
 
 
@@ -927,13 +1124,103 @@ test set （测试集） ：20%。
 
 ### 13.1 Iterative loop of ML development
 
-
+<img src="images/屏幕截图 2025-02-09 021215.png" style="zoom:33%;" />
 
 ### 13.2 Error analysis
+
+你有500个 cross validation set，算法错误分类了500个cross validation set中的100个，错误分析过程是指手动查看这100个样本，并尝试从中获得算法出错的洞察。
+
+具体来说，就是找到一组被算法错误分类的样本，这些样本来自cross validation set，并尝试将他们分组到常见的主题或共同特征中
+
+- 100个分类错误
+
+1. pharmaceutical sapm emails：21
+2. Deliberate misspellings（w4tches，med1cine）：3
+3. Unusual email routing：7
+4. steal passwords（phishing）：18
+5. spam message in embedded iamge：5
+
+从数据中看pharmaceutical sapm emails 和 steal passwords 是个大问题，而Deliberate misspellings虽然是个问题，但只是一个较小的问题，即使你构建了非常复杂的算法解决Deliberate misspellings这个问题，也只占100个中的3个，影响有限。
+
+另外，这些问题是可以重叠的，比如pharmaceutical sapm emails同时也有Unusual email routing的问题，Deliberate misspellings同时也有steal passwords的问题，所以一个邮件可以被计入多个类别。
+
+
+
+假设你有5000个cross validation set，那么可能有1000个错误分类的样本，这时候，你就没有时间查看这么多样本，通常会抽取一个子集 100个样本进行查看。
+
+
+
+在经过这个分析后，你发现很多错误都是pharmaceutical sapm emails，你就需要进行下一步的工作，例如收集更多有关 pharmaceutical sapm emails的数据，以便学习算法能够更好的识别这些药品是垃圾邮件。或者提出一些垃圾邮件试图销售的药品名，作为相关的特征，以便你的算法能更好的识别这种药品垃圾邮件。
+
+
+
+**错误分析，就是手动检查一组你算法错误分类、错误标记的样本**
+
+
+
+- 局限性
+
+人类擅长的东西，能手动从错误中识别出来的东西，表现的很好。
+
+人类不擅长的东西，不能手动从错误中识别出来的，则表现的不好。
 
 
 
 ### 13.3 Adding data
+
+对于某些问题，人类可以创建标签、收集更多数据。但对于某些问题，无法获得更多数据，这就是为什么在不同的应用中，要使用不同的技术。
+
+
+
+在构建Machine Learning 算法时，我们总想要更多的数据
+
+1. **添加数据。**
+
+   ①添加everything类型的数据。
+
+   ②添加typicaly类型的数据。
+
+   > 针对错误分析进行添加，只需要少量数据，就可以显著提高算法发性能，节省成本。
+
+2. **Data augmentaion（数据增强）**
+
+3. **Data synthesis（数据生成）**
+
+
+
+- **Data augmentation（数据增强）**
+
+<img src="images/屏幕截图 2025-02-09 160915.png" style="zoom:33%;" />
+
+<img src="images/屏幕截图 2025-02-09 160905.png" style="zoom:33%;" />
+
+通过对数据每个网格的随机扭曲，对每个像素添加噪音，可以得到多个样本
+
+
+
+**Data augmentation for speech**
+
+<img src="images/屏幕截图 2025-02-09 161034.png" style="zoom:33%;" />
+
+在语言识别中，通过添加噪音，可以得到多个样本
+
+
+
+- **Data synthesis（数据生成）**
+
+<img src="images/屏幕截图 2025-02-09 161331.png" style="zoom:33%;" />
+
+<img src="images/屏幕截图 2025-02-09 161348.png" style="zoom:33%;" />
+
+在图片识别文字的问题上，可以自己找艺术字生成样本，让算法学习。
+
+
+
+- Engineering the data used by your system
+
+AI = Code（algorithm/mdoel） + Data
+
+过去的几十年，机器学习研究者通常会专注于算法。而得益于机器学习研究这一范式，现在我们能够使用很多优秀的算法了 ，因此将更多的时间投入到数据中，专注于优化数据，效果会更好
 
 
 
@@ -941,25 +1228,124 @@ test set （测试集） ：20%。
 
 ### 13.4 Transfer learning : using data from a different task
 
+transfer learning（迁移学习）：适用于难以获得数据的场景。关键思想是从一个完全不同，但相关的任务中获取数据，通过神经网络 可以利用不同任务的数据来使你的算法在应用中表现的更好。
 
+
+
+- transfer learning
+
+<img src="images/屏幕截图 2025-02-10 014532.png" style="zoom:50%;" />
+
+假设你想识别 0~9 的手写数字，但你没有很多这些手写数字的标签数据，你可以这样做。
+
+先找一个包含100万张猫、狗、汽车、人等图片的大型数据集，你可以先在这个大型数据集上训练一个神经网络，该数据集有1000个类别。然后以 x为输入，学习识别这1000个不同的类别，第一层参数$w^{[1]},b^{[1]}$,第二层参数$w^{[2]},b^{[2]}$,第三层参数$w^{[3]},b^{[3]}$,第四层参数$w^{[4]},b^{[4]}$,第五层参数$w^{[5]},b^{[5]}$。
+
+要应用迁移学习，你可以复制这个网络保留第一层参数$w^{[1]},b^{[1]}$,第二层参数$w^{[2]},b^{[2]}$,第三层参数$w^{[3]},b^{[3]}$,第四层参数$w^{[4]},b^{[4]}$，但对于最后一层 output layer，你需要删除并替换成一个你需要的output layer，只有10个输出，代表0~9数字识别。
+
+注意第五层参数$w^{[5]},b^{[5]}$不能复制过来，因为这一层已经改变，你需要从头训练。
+
+使用output layer之外的所有层，作为神经网络参数的起点，然后运行优化算法。
+
+有两种方法可以训练这个神经网络的参数
+
+1. 只训练output layer的参数，保留除了output layer之外的所有参数。
+
+   > 适用于：训练集很小
+
+2. 训练所有参数
+
+   > 适用于：训练集很大
+
+
+
+- 为什么迁移学习可以工作？
+
+<img src="images/屏幕截图 2025-02-10 015010.png" style="zoom:33%;" />
+
+在大量不同的图片上学习检测不同类别，他的第一层是 检测edges（线段），第二层检测corners，第三层检测curves/basic shapes，这些东西是通用的，对于检测手写数字，也很有帮助。
+
+
+
+- 迁移学习限制
+
+图片任务，只能用训练图片的神经网络进行迁移。
+
+音频任务，只能用训练音频的神经网络进行迁移。
+
+文本任务，只能用训练文本的神经网络进行迁移。
+
+
+
+- 总结
+
+迁移学习的步骤
+
+1. 下载一个在大型数据集上预训练的神经网络，并且输入类型 要与你需要训练的类型相同（eg：图片、音频、文本）
+
+   > 1亿张图片的训练集
+
+2. 在你的数据上进一步训练，进行微调
+
+   > 1000张图片的训练集
 
 ### 13.5 Full cycle of a machine learning project
 
+当你在构建一个有价值的机器学习系统时，你需要考虑和规划哪些步骤？
 
+<img src="images/屏幕截图 2025-02-10 015834.png" style="zoom: 33%;" />
+
+1. 确定项目范围：决定项目具体内容和你想解决的问题
+2. 收集数据：决定机器学习训练需要哪些数据
+3. 训练模型：训练，错误分析，循环改进。
+4. 部署模型：部署，并继续监控系统的性能
+
+
+
+- Deployment
+
+<img src="images/屏幕截图 2025-02-10 024022.png" style="zoom: 50%;" />
+
+将学习模型部署到一个服务器上，称其为推理服务器，它的工作是调用你训练好的学习模型进行预测。
+
+然后部署一个app，当用户使用app使，发起一个API调用，将音频传递给你的推理服务器。
+
+推理服务器使用机器学习模型进行预测，然后返回给模型
 
 
 
 ### 13.6 Fairness,bias ,and ethics
 
-
+主要介绍一些道德规范....
 
 ## 十四、Skewed datasets(optional)
 
 ### 14.1 Error metrics for skewed datasets
 
+如果一个罕见病的发病率只有0.5% 。那么算法只要一直输出y=0(不患病)，那算法的正确率都会有99.5%，这是明显不合理的。
+
+如果你有3个算法， 一种是99.2%的正确率 ，一种99.3%的正确率，一种99.5%的正确率，你很难判断哪一种是最好的
+
+- 精确率、召回率
+
+![](images/屏幕截图 2025-02-10 042404.png)
+
+可以让你更容易发现算法中存在的问题，如果算法一直判断y=0：
+
+​	算法将不会预测任何y=1的情况，True positive = 0，False positive = 0，精确率变为$\frac{0}{0+0}$，召回率变为$\frac{0}{0+10}$
+
 
 
 ### 14.2 Trading off precision and recall
+
+我们希望算法有高精确率和高召回率
+
+高精确率（high precision）：高精确率意味着模型在预测为正类的样本中，错误预测（即将负类预测为正类）的比例较低。换句话说，模型预测为正类的样本大多是真正的正类。
+
+高召回率（high recall）：高召回率意味着模型能够识别出大部分实际为正类的样本，漏报（False Negatives）的比例较低。
+
+<img src="images/屏幕截图 2025-02-10 052222.png" style="zoom:50%;" />
+
+<img src="images/屏幕截图 2025-02-10 052259.png" style="zoom:50%;" />
 
 
 
@@ -967,11 +1353,27 @@ test set （测试集） ：20%。
 
 ### 15.1 Decision Tree Model
 
+输入特征x，是否能判断出猫？
+
+<img src="images/屏幕截图 2025-02-10 052606.png" style="zoom: 50%;" />
+
+<img src="images/屏幕截图 2025-02-10 052536.png" style="zoom:50%;" />
+
+
+
+<img src="images/屏幕截图 2025-02-10 052606.png" style="zoom:50%;" />
+
+决策树学习算法的任务是，从所有可能的决策树中，尝试挑选一个在训练集上表现良好，并且在理想情况下也能很好的泛化到新数据的树，例如交叉验证集和测试集
+
 
 
 ### 15.2 Learning Process
 
+<img src="images/屏幕截图 2025-02-10 052849.png" style="zoom:50%;" />
 
+<img src="images/屏幕截图 2025-02-10 052924.png" style="zoom:50%;" />
+
+<img src="images/屏幕截图 2025-02-10 052954.png" style="zoom:50%;" />
 
 
 
@@ -979,29 +1381,182 @@ test set （测试集） ：20%。
 
 ### 16.1 Measuring purity
 
+一种测量纯度的方法，如果样本全是猫 或单一类别，那么它的纯度非常高，如果全是非猫，纯度也非常高， 但如果介于两者之间，如何量化这个样本的纯度？
 
+
+
+- Entropy as a measure of impurity
+
+> 熵：用来测量纯度
+
+<img src="images/屏幕截图 2025-02-12 144627.png" style="zoom:50%;" />
+
+$p_1=\frac{3}{6}$：猫所占比例。
+
+$H(p_1)$：Entropy（熵）的函数用H表示，$p_1$为参数。
+
+横轴是样本中猫的比例$p_1$，纵轴是熵的值。在这个例子中，当$p_1=0.5$时，Entropy=1，为最高值。
+
+当样本集为0.5时，不纯度 最大，熵为1，当样本集全为猫时，$p_1=0$，当样本集全为狗时，$p_1=1$。
+
+
+
+- 看几个其他的例子
+
+<img src="images/屏幕截图 2025-02-12 144717.png" style="zoom:50%;" />
+
+
+
+- $p_1$数学公式
+
+$p_1$表示猫的比例，则$p_0=p_1-0$，表示狗的比例。
+
+<img src="images/屏幕截图 2025-02-12 144948.png" style="zoom:50%;" />
 
 
 
 ### 16.2 choosing a split : Information Gain
 
+Imformation Gain（信息增益）：构建决策树时，我们决定在节点上分割哪个特征，从而最大程度减少熵，减少不纯度，最大化纯度的过程，成为imformation gain。
+
+
+
+<img src="images/屏幕截图 2025-02-12 145402.png" style="zoom:50%;" />
+
+在决策树根据特征分割猫、狗时， 不同的特征 ear shape、face shape、whiskers 能分出3组不同的猫、狗。
+
+我们该选择哪一个特征进行分割？因为不同的特征，分出来的熵都不同，这些不同组的熵 又如何比较呢？ → **加权平均**
+
+
+
+- 信息增益(imformation gain)
+
+通过加权平均，计算出imformation gain的值。
+
+<img src="images/屏幕截图 2025-02-12 145714.png" style="zoom: 50%;" />
+
+imformation gain分类为：0.28、0.03、0.12。
+
+imformation gain衡量的是 在你的决策树中，通过分割获得的熵减少量。
+
+决定何时不进一步分割的准则是：如果熵减少量太少，这种情况下你可以不必冒着 增加树的大小、过拟合的风险进行分割，如果熵减少量低于某个阈值，就决定不再分割。
+
+
+
+- imformation gain公式
+
+<img src="images/屏幕截图 2025-02-12 150115.png" style="zoom:33%;" />
+
 
 
 ### 16.3 Putting it together
 
+- 构建决策树的整体过程
 
+1. 所有的training examples作为root node
+
+2. 计算imformation gain，选择imformation gain最高的feature进行splitting。
+
+3. 创建left branch 和 right branch，将training examples分配给left branch 和 right branch。
+
+4. 重复splitting过程，直到满足停止标准
+
+   **停止标准**
+
+   - 一个节点100%属于单一类别，entropy为0。
+   - 进一步分裂导致树超过你设置的最大深度
+   - information gain的熵减少量小于某个阈值（threshold）
+   - 节点中的样本数量小于某个阈值（threshold）
+
+
+
+- recursive splitting（递归分裂）
+
+<img src="images/屏幕截图 2025-02-12 235205.png" style="zoom:50%;" />
+
+1. 计算根节点的信息增益，发现ear shape 的熵减少量最佳，于是选择earshape.
+
+2. 创建 左分支pointy 和 右分支floppy，并把数据集发给左右分支。
+
+3. 先看左分支
+
+   3.1 检查是否满足停止分裂的标准，发现不满足
+
+   3.2 依次查看每个特征，并计算信息增益，发现face shpe的熵减少量最佳，于是选择earshape
+
+   ​	3.2.1 检查是否满足停止分裂的标准，发现满足
+
+   ​	3.2.2 停止分裂
+
+4. 右分支同理
+
+
+
+树的深度越大，决策树模型越复杂，相当于多项次函数， 因此可以选择cross-validation来选择深度
 
 
 
 ### 16.4 Using one-hot encoding of categorical features
 
+在目前看到的例子中，每个特征只能取两个可能值中的一个，ear shape要么是pointy 要么是 floppy，但如果你的特征可以取两个以上的离散值呢？
+
+
+
+- one-hot encoding （独热编码）
+
+<img src="images/屏幕截图 2025-02-13 011855.png" style="zoom:50%;" />
+
+ear shape有三个形状 pointy、floppy、oval， 耳朵可以取3个可能值 而不是2个，可以创建3个分支。
+
+可以通过0、1 来表示不同的特征。
+
+这种方式不仅适用于决策树，也适用于神经网络
+
 
 
 ### 16.5 Continuous valued features
 
+之前处理的是离散值，那如何处理连续值呢？ 比如根据体重分割猫、狗
+
+<img src="images/屏幕截图 2025-02-13 012930.png" style="zoom:50%;" />
+
+尝试以 Weight=8 作为阈值分割，算出information为0.24， 又尝试以Weight=9 作为阈值分割，算出information为0.61 ..........
+
+总共有10只猫狗，于是尝试9种阈值（从小到大排序，取两两中点），取information最大的 作为阈值
+
+
+
 
 
 ### 16.6 Regression Trees（optional）
+
+<img src="images/屏幕截图 2025-02-13 015016.png" style="zoom:50%;" />
+
+想要通过Decision Trees来预测体重
+
+<img src="images/屏幕截图 2025-02-13 015057.png" style="zoom:50%;" />
+
+只要符合 Ear shape=pointy，Face shape=round的，体重就预测为 8.35（$\frac{7.2+8.4+7.6+10.2}{4}$），其他的同理。
+
+
+
+- 那么关键是，为了预测体重，如何重新构建回归树？
+
+<img src="images/屏幕截图 2025-02-13 015224.png" style="zoom:50%;" />
+
+在构建回归树时，我们不再像决策树一样 试图减少熵，而是试图减少体重的方差。
+
+分割过程会不断寻找特征（ear shape、face shape、whiskers）的最佳分割点，使得分割后的群体体重差异（方差）更小。
+
+所有的10个样本，方差是20.51，然后假设根据不同的feature进行分割 从而计算方差，看哪种分割，减少的方差最大。
+
+> - **决策树**
+>
+> 在分类任务中，每个节点会根据某个特征进行分割，目的是让子节点中的样本尽可能属于同一类别，这时候常用的指标有信息增益（基于熵）或者基尼不纯度。
+>
+> - **回归树**
+>
+> 用来预测连续数值，因此在每个节点，分割的标准不再是类别纯度，而是如何减少预测值的方差，使得分割后的子集尽可能相似。
 
 
 
@@ -1009,21 +1564,81 @@ test set （测试集） ：20%。
 
 ### 17.1 Using multiple desicion trees
 
+> **鲁棒性**：模型对数据中的噪声、缺失值、异常值不敏感，预测性能不会因数据的小幅扰动而大幅下降。
 
+使用单一决策树的坏处是，决策树对数据的微小变化敏感，解决的方法是构建不止一颗决策树，让算法不那么敏感 或 让算法更鲁棒（robust）,这种构建很多决策树，我们称之为树集成。
+
+![](images/屏幕截图 2025-02-13 025301.png)
+
+
+
+- 仅仅微小的变化，就可以生成两颗不同的决策树
+
+<img src="images/屏幕截图 2025-02-13 025321.png" style="zoom:50%;" />
+
+- 决策树的集合
+
+![](images/屏幕截图 2025-02-13 025301.png)
+
+假设你有一个三棵树组成的集合，每棵树都是一种分类猫、非猫的合理方式，如果你有一个新样本让着三棵树对这个新样本进行分类，并让他们投票决定最终的预测结果，由于三颗树的预测结果多数投票是猫，于是这个树的集成最终预测是一只猫
 
 
 
 ### 17.2 Sampling with replacement
 
+- sampling with replacement（有放回抽样）
+
+<img src="images/屏幕截图 2025-02-13 030212.png" style="zoom:50%;" />
+
+把10个猫狗放进一个箱子里，每次拿出一个 记录下来，再放回，重复这样10次。
+
+最终得到的training examples并不包含所有的10个原始training examples。
+
+sampling with replacement让你构建一个新的training examples，有点类似但不同于你的original training set，这是构建树集成的关键模块
+
 
 
 ### 17.3 Random forest algorithm
 
+现在我们有了一个方法，可以通过有放回抽样创建新的training set，这些training set和original trainining有些相似 也有些不同，在这个视频中，将讨论random forest algorithm，这是一种非常强大的树集合算法，其效果远优于使用单一决策树。
 
+
+
+- bagged decision tree（袋装决策树）
+
+如果你有一个大小为m的训练集，那么对于 b = 1 to B（即我们这样做B次），你可以通过有放回抽样来创建大小为m的新训练集，如果你有10个training set，那么将这10个training set放入虚拟袋中，并进行10次有放回抽样以生成一个 10个样本的新训练集，如果你在这个新训练集上训练决策树算法，你将得到这颗决策树，完成一次后 再重复这个过程，将得到又一个决策树，你这样做B次，就得到了B颗这样的树。
+
+关于B的选择推荐64 ~ 128 之间的值，B太大了 永远不会损害性能 但超过某个点后 收益递减 显著减慢计算速度， B太小了 训练效果不好。
+
+由于在根节点，这些树总是使用相同的分割，因此提出了一种改进的算法Random forest algorithm
+
+
+
+- Random forest algorithm
+
+尝试在每个节点上随机化特征选择，使这些树集合变得更加不同，从而在投票时得到更准确的预测，通常做法是 在每个节点上选择一个特征进行分裂时，如果有n个特征可用，则选一个随机子集k，k<n，仅允许算法选择子集k里的特征作为节点 ，然后从这k个特征中选择information gain最高的特征作为分裂的选择
+$$
+k=\sqrt[]n
+$$
+
+
+Random forest algorithm算法比单个决策树表现更好，也更鲁棒（robust），这种替换过程导致算法探索了许多对数据的微小变化，并且训练了不同的决策树，并平均了采样替换过程导致的所有数据变化，这意味着任何数据微小的变化都不会对整个random forest algorithm产生太大的影响
 
 ### 17.4 XGBoost
 
+- boosted trees intuition
 
+<img src="images/屏幕截图 2025-02-13 041735.png" style="zoom:50%;" />
+
+每次通过这个循环，从第二次开始，在采样时，不再以$\frac{1}{m}$的概率从所有的m个样本中均匀选择，而是更有可能选择之前训练的树表现不佳的错误分类样本。类似于练琴时 只练错误的段落。
+
+
+
+- XGBoost
+
+<img src="images/屏幕截图 2025-02-13 041914.png" style="zoom:50%;" />
+
+<img src="images/屏幕截图 2025-02-13 041927.png" style="zoom:50%;" />
 
 
 
@@ -1033,5 +1648,30 @@ test set （测试集） ：20%。
 
 ### 18.1 When to use decision trees
 
+决策树、树集成、神经网络 都是非常强大高效的学习算法，那你应该什么时候选择其中一个呢？
 
+<img src="images/屏幕截图 2025-02-13 054255.png" style="zoom:50%;" />
+
+
+
+- 决策树、树集成
+
+1. 在 表格（结构化数据）上表现良好，如果你的数据看起来像一个巨大的电子表格，那么决策树是值得考虑的。例如在房价预测应用中，我们有一个数据集，其特征有 房屋大小、卧室数量、楼层数、房屋年龄 这种数据存储在电子表格中，具有分类或连续值特征，并且适用于分类或回归任务，即预测离散类别或预测数值，这些问题是决策树擅长处理的。
+
+2. 不建议在非结构数据上使用决策树和树集成。 非结构数据 如图像、视频、音频、文本，你不太可能以电子表格格式存储。
+
+3. 决策树和树集成的优势是 他们的训练速度快，你可以通过这个循环 高效的改进学习算法
+
+   <img src="images/屏幕截图 2025-02-13 053708.png" style="zoom:33%;" />
+
+4. 小型决策树，是人类可解释的。如果你训练一个决策树 只有几十个节点，那么你能够打印出这个决策树 并且理解它如何做出决策。但如果你建立一个100颗树的集成，并且每课时有数百个节点时，理解起来也会很困难
+
+
+
+- 神经网络
+
+1. 在表格（结构化数据）、非表格（非结构化数据）都表现良好。在非结构化数据上，神经网络是首选算法，而不是决策树或树集成。
+2. 神经网络的一个缺点是，它比决策树慢，大型神经网络需要很长时间来训练
+3. 神经网络的好处包括 它适用于迁移学习，这一点非常重要，因为在许多只有少量数据集的应用中，能够使用迁移学习并在更大的数据集上预训练，这对获得竞争性能至关重要
+4. 如果你在构建一个由多个机器学习模型协同工作的系统，将多个神经网络串联起来 并进行训练，可能比多个决策树更容易，你可以将多个神经网络串联起来 使用梯度下降一起训练。而对于决策树，你一次只能训练1个决策树。
 
